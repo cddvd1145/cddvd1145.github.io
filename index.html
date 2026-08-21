@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RO青砚工作室 | 官网</title>
+    <link rel="icon" href="images/PNG.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background-color: #f7f8fa;
+            color: #222;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        /* 顶部通栏：修改为两端对齐布局 */
+        .top-bar {
+            height: 56px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 10;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .top-logo {
+            height: 38px;
+            cursor: pointer;
+        }
+        .bilibili-top-btn{
+            padding:7px 14px;
+            border:1px solid #fb7299;
+            background:#fb7299;
+            color:#fff;
+            cursor:pointer;
+            font-size:14px;
+            text-decoration:none;
+            border-radius:0;
+        }
+        .bilibili-top-btn:hover{
+            background:#e26287;
+        }
+        /* 整体布局 */
+        .layout-wrap {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        /* 左侧侧边栏 */
+        .sidebar-left {
+            width: 220px;
+            background: #fff;
+            border-right: 1px solid #e5e7eb;
+            padding: 20px 12px;
+        }
+        .sidebar-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            text-align: left;
+            font-size: 15px;
+            border-radius: 0px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            margin-bottom: 6px;
+        }
+        .sidebar-btn:hover {
+            background: #eff2f7;
+        }
+        /* 点击后激活突出样式：右移+灰色背景 */
+        .sidebar-btn.active-click{
+            transform: translateX(8px);
+            background-color:#d8d9db;
+        }
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        /* 页面切换动画【修复遮挡核心】 */
+        .page {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            right: 40px;
+            bottom: 40px;
+            opacity: 0;
+            transform: translateY(25px);
+            transition: all 0.32s ease;
+            pointer-events: none;
+            overflow-y: auto;
+            padding-right:10px;
+        }
+        .page.active {
+            opacity: 1;
+            transform: translateY(0px);
+            pointer-events: auto;
+        }
+        .small-logo {
+            height: 60px;
+            margin-bottom: 20px;
+        }
+        .preview-img {
+            max-width: 100%;
+            max-height: 600px;
+            margin: 20px 0;
+            object-fit: contain;
+            border-radius: 0;
+        }
+        .download-btn {
+            padding: 10px 22px;
+            border-radius: 0;
+            border: none;
+            background: #3b77e8;
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .download-btn:hover {
+            background: #2c62c9;
+        }
+        /* 弹窗 */
+        .mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            opacity:0;
+            transition: opacity 0.25s ease;
+            pointer-events:none;
+        }
+        .mask.show {
+            opacity:1;
+            pointer-events:auto;
+        }
+        .modal-box {
+            background: white;
+            padding: 30px;
+            border-radius: 0;
+            min-width: 360px;
+            transform: translateY(40px);
+            transition: transform 0.28s ease;
+        }
+        .mask.show .modal-box{
+            transform: translateY(0);
+        }
+        .mask.hide-modal .modal-box{
+            transform: translateY(60px);
+        }
+        .modal-box h3 {
+            margin-bottom: 16px;
+        }
+        .modal-box p {
+            margin-bottom: 24px;
+            color: #444;
+        }
+        .modal-close {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 0;
+            background: #ddd;
+            cursor: pointer;
+        }
+        .modal-close:hover {
+            background: #ccc;
+        }
+        .text-block{
+            margin:16px 0;
+            line-height:1.8;
+        }
+        .real-link{
+            color:#008833;
+            text-decoration: underline;
+        }
+        h3{
+            margin:12px 0 8px;
+        }
+        /* 讲解板块按钮 */
+        .explain-select button{
+            margin: 8px 6px 8px 0;
+            padding:9px 16px;
+            border:1px solid #ccc;
+            background:#fff;
+            cursor:pointer;
+            border-radius:0;
+        }
+        .explain-select button:hover{
+            background:#f0f3f8;
+        }
+        /* =========讲解面板：全部直接显示，不再做隐藏动画========= */
+        .explain-panel{
+            margin-top:16px;
+            padding:18px;
+            border:1px solid #ddd;
+            scroll-margin-top:20px;
+        }
+        /* 底部版权信息 */
+        .footer {
+            height: 42px;
+            background:#ffffff;
+            border-top:1px solid #e5e7eb;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:13px;
+            color:#666666;
+            flex-shrink:0;
+        }
+        /* 游戏样式 */
+        .game-card{
+            margin:30px 0;
+            border:1px solid #ccc;
+            padding:20px;
+        }
+        .game-preview{
+            width:240px;
+            height:400px;
+            background:#222;
+            color:#fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border:2px solid #333;
+            margin-bottom:12px;
+        }
+        .game-preview-brick{
+            width:480px;
+            height:320px;
+            background:#222;
+            color:#fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border:2px solid #333;
+            margin-bottom:12px;
+        }
+        canvas{
+            border:2px solid #333;
+            background:#000;
+            display:none;
+        }
+        .game-tip{
+            font-size:13px;
+            color:#555;
+            margin:8px 0;
+        }
+
+        /* ========= HTML编辑器样式 ========= */
+        .editor-toolbar{
+            margin-bottom:12px;
+        }
+        .editor-toolbar button{
+            margin-right:8px;
+            padding:8px 14px;
+            border:1px solid #bbb;
+            background:#fff;
+            cursor:pointer;
+        }
+        .editor-wrap{
+            position:relative;
+            width:100%;
+            height:calc(100% - 70px);
+            border:1px solid #ccc;
+        }
+        #htmlCode{
+            width:100%;
+            height:100%;
+            background:#1e1e1e;
+            color:#fff;
+            padding:10px;
+            font-family:"Consolas",monospace;
+            font-size:14px;
+            border:none;
+            outline:none;
+            resize:none;
+            position:absolute;
+            top:0;
+            left:0;
+            z-index:2;
+        }
+        .highlight-view{
+            width:100%;
+            height:100%;
+            padding:10px;
+            font-family:"Consolas",monospace;
+            font-size:14px;
+            white-space:pre;
+            background:#1e1e1e;
+            pointer-events:none;
+            position:absolute;
+            top:0;
+            left:0;
+            overflow:auto;
+            color:#d4d4d4;
+        }
+        .hl-tag{color:#569cd6;}
+        .hl-attr{color:#9cdcfe;}
+        .hl-string{color:#ce9178;}
+        .hl-comment{color:#6a9955;}
+    </style>
+</head>
+<body>
+    <!-- 顶部栏：新增B站跳转按钮 -->
+    <div class="top-bar">
+        <img class="top-logo" src="images/logo2.png" alt="工作室图标">
+        <a class="bilibili-top-btn" target="_blank" rel="noopener noreferrer"
+           href="https://space.bilibili.com/3707004432418865?spm_id_from=333.1007.0.0">哔哩哔哩首页</a>
+    </div>
+    <div class="layout-wrap">
+        <!-- 左侧菜单 -->
+        <div class="sidebar-left">
+            <button class="sidebar-btn" data-page="home">首页</button>
+            <button class="sidebar-btn" data-page="download">下载ISO</button>
+            <button class="sidebar-btn" data-page="explain">讲解</button>
+            <button class="sidebar-btn" data-page="game">小游戏</button>
+            <button class="sidebar-btn" data-page="htmleditor">HTML编辑器</button>
+            <button class="sidebar-btn" data-page="about">关于我们</button>
+        </div>
+        <!-- 主体内容 -->
+        <div class="main-content">
+            <!-- 首页 -->
+            <div class="page active" id="home">
+                <img class="small-logo" src="images/logo.png" alt="工作室">
+                <h2>欢迎来到官网，点击左侧按钮开始浏览吧</h2>
+            </div>
+            <!-- 下载ISO页面：已删除preview-img图片 -->
+            <div class="page" id="download">
+                <img class="small-logo" src="images/logo.png" alt="工作室">
+                <h2>ISO / PE 资源下载</h2>
+                <div class="text-block">
+                    <h3>PE讲解</h3>
+                    <p>PE是Windows预安装环境，属于轻量级微型操作系统。主要用于电脑维护，可以在不启动本机硬盘系统的前提下，从U盘启动电脑。可以实现重装系统、修复损坏系统、备份磁盘数据、清除密码、硬盘分区等操作。本项目为RO青砚自研PE，目前处于测试开发阶段，尚未对外发布正式版本。</p>
+                </div>
+                <br>
+                <button class="download-btn" id="getDownload">下载PE</button>
+            </div>
+            <!-- 讲解页面：三个面板全部显示，按钮用于滚动跳转 -->
+            <div class="page" id="explain">
+                <img class="small-logo" src="images/logo.png" alt="工作室">
+                <h2>系统与病毒知识讲解</h2>
+                <div class="explain-select">
+                    <button data-target="win-panel">Windows系统讲解</button>
+                    <button data-target="linux-panel">Linux系统讲解</button>
+                    <button data-target="virus-panel">银狐病毒讲解</button>
+                </div>
+                <div class="explain-panel" id="win-panel">
+                    <h3>Windows系统讲解</h3>
+                    <div class="text-block">
+                        <p>Windows由微软公司开发，1985年发布最早的Windows 1.0版本。早期版本并不是独立操作系统，必须依赖MS‑DOS才能运行，本质上是DOS上面的图形界面外壳。</p>
+                        <p>1995年发布Windows 95，真正意义上将图形界面与系统内核深度结合，开始普及到普通家庭。后续依次推出Windows 98、Windows 2000、Windows XP，XP成为一代经典家用系统。之后迭代Windows Vista、Windows7，Win7长期占据大量家用电脑。再往后是Windows8、Windows8.1，最后发展到现在广泛使用的Windows10、Windows11。</p>
+                        <p>Windows拥有丰富软件生态，绝大多数桌面软件、游戏都优先适配Windows系统，多用于家用、办公、游戏电脑。缺点是更容易遭遇病毒、流氓软件攻击，需要做好安全防护。</p>
+                        <p>真正官网：<a class="real-link" href="https://www.microsoft.com/zh-cn/windows" target="_blank">微软Windows官方</a></p>
+                    </div>
+                </div>
+                <div class="explain-panel" id="linux-panel">
+                    <h3>Linux系统讲解</h3>
+                    <div class="text-block">
+                        <p>Linux内核由林纳斯·托瓦兹（Linus Torvalds）在1991年正式发布，是完全开源免费的操作系统内核。任何人都可以获取源代码，自由修改、分发。</p>
+                        <p>Linux本身只是内核，完整操作系统叫Linux发行版。知名发行版有面向桌面的Ubuntu、Fedora；面向服务器的Debian、CentOS；面向老旧硬件的Debian、MX‑Linux。全球绝大多数服务器、云主机、路由器、安卓手机底层都基于Linux内核。</p>
+                        <p>优势：开源、占用资源可控、稳定性高、病毒极少。缺点是桌面软件数量相比Windows少，部分游戏、专业软件没有原生版本，新手入门学习门槛更高。</p>
+                        <p>真正官网：<a class="real-link" href="https://www.kernel.org/" target="_blank">Linux内核官网</a></p>
+                    </div>
+                </div>
+                <div class="explain-panel" id="virus-panel">
+                    <h3>银狐病毒讲解</h3>
+                    <div class="text-block">
+                        <p>银狐病毒诞生于2024年，属于木马类恶意程序。主要通过伪装工具、破解软件进行传播，入侵Windows平台。</p>
+                        <p>主要特征：会窃取账号密码、浏览器保存的凭据；后台偷偷下载更多恶意组件；部分变种会远程控制电脑；很难被普通杀毒软件彻底清除；不会大量破坏文件，偏向于静默窃取信息。</p>
+                        <p>真正官网：<a class="real-link" href="#" target="_blank">病毒无官方站点</a></p>
+                    </div>
+                </div>
+            </div>
+            <!-- 小游戏页面 -->
+            <div class="page" id="game">
+                <img class="small-logo" src="images/logo.png" alt="工作室">
+                <h2>小游戏</h2>
+                <!--俄罗斯方块-->
+                <div class="game-card">
+                    <h3>俄罗斯方块</h3>
+                    <div class="game-preview" id="tetrisPreview">俄罗斯方块演示预览</div>
+                    <canvas id="tetris" width="240" height="400"></canvas>
+                    <div class="game-tip">操作：← →移动，↓加速，↑/X旋转，空格快速下落，ESC退出游戏</div>
+                    <button class="download-btn" onclick="startTetrisGame()">开始游戏</button>
+                </div>
+                <!--打砖块-->
+                <div class="game-card">
+                    <h3>打砖块</h3>
+                    <div class="game-preview-brick" id="brickPreview">打砖块演示预览</div>
+                    <canvas id="brick" width="480" height="320"></canvas>
+                    <div class="game-tip">操作：← →移动挡板，ESC退出游戏</div>
+                    <button class="download-btn" onclick="startBrickGame()">开始游戏</button>
+                </div>
+            </div>
+            <!-- HTML编辑器页面 -->
+            <div class="page" id="htmleditor">
+                <img class="small-logo" src="images/logo.png" alt="工作室">
+                <h2>HTML编辑器</h2>
+                <div class="editor-toolbar">
+                    <button id="btnNew">新建</button>
+                    <button id="btnImport">导入</button>
+                    <button id="btnExport">导出</button>
+                    <input type="file" id="fileInput" accept=".html,.htm" style="display:none">
+                </div>
+                <div class="editor-wrap">
+                    <div class="highlight-view" id="highlightView"></div>
+                    <textarea id="htmlCode" spellcheck="false"></textarea>
+                </div>
+            </div>
+            <!-- 关于我们 -->
+            <div class="page" id="about">
+                <img class="small-logo" src="images/logo.png" alt="工作室">
+                <h2>RO青砚工作室</h2>
+                <p class="text-block">官方首页，本官网持续开发中</p>
+            </div>
+        </div>
+    </div>
+    <!-- 底部版权所有 -->
+    <div class="footer">
+        © RO青砚工作室 版权所有
+    </div>
+    <!-- 测试弹窗 -->
+    <div class="mask" id="modalMask">
+        <div class="modal-box">
+            <h3>测试提示</h3>
+            <p>当前网站处于测试阶段，暂时无法下载PE镜像！</p>
+            <button class="modal-close" id="closeModal">确定</button>
+        </div>
+    </div>
+<script>
+    // ==========页面切换 + 侧边栏按钮点击突出效果==========
+    const buttons = document.querySelectorAll('.sidebar-btn');
+    const pages = document.querySelectorAll('.page');
+    let sidebarTimer = null;
+    buttons.forEach(btn => {
+        btn.onclick = function(){
+            stopAllGame();
+            if(sidebarTimer) clearTimeout(sidebarTimer);
+            buttons.forEach(b=>b.classList.remove('active-click'));
+            this.classList.add('active-click');
+            const targetId = this.getAttribute('data-page');
+            pages.forEach(p => p.classList.remove('active'));
+            document.getElementById(targetId).classList.add('active');
+            sidebarTimer = setTimeout(()=>{
+                this.classList.remove('active-click');
+            },5000);
+        }
+    })
+    // ==========讲解页面按钮：平滑滚动到对应板块==========
+    const explainBtns = document.querySelectorAll(".explain-select button");
+    explainBtns.forEach(btn=>{
+        btn.onclick=function(){
+            const tid=this.getAttribute("data-target");
+            const targetDom = document.getElementById(tid);
+            targetDom.scrollIntoView({
+                behavior:"smooth",
+                block:"start"
+            });
+        }
+    })
+    // ==========下载弹窗【带动画关闭】==========
+    const mask = document.getElementById('modalMask');
+    const downloadBtn = document.getElementById('getDownload');
+    const closeBtn = document.getElementById('closeModal');
+    downloadBtn.onclick = function(){
+        mask.classList.remove("hide-modal");
+        mask.classList.add('show');
+    }
+    function closeModalAnim(){
+        mask.classList.add("hide-modal");
+        setTimeout(()=>{
+            mask.classList.remove('show','hide-modal');
+        },280);
+    }
+    closeBtn.onclick = closeModalAnim;
+    mask.onclick = function(e){
+        if(e.target === mask) closeModalAnim();
+    }
+    // ==========游戏全局状态==========
+    let tetrisTimer=null;
+    let brickTimer=null;
+    const tetrisCanvas = document.getElementById("tetris");
+    const tctx = tetrisCanvas.getContext("2d");
+    const brickCanvas=document.getElementById("brick");
+    const bctx=brickCanvas.getContext("2d");
+    const ROW=20,COL=12,SZ=20;
+    let board,piece,px,py;
+    let ballX,ballY,ballDX,ballDY,padX,bricks;
+    const shapes=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]],[[0,0,1],[1,1,1]],[[1,1,0],[0,1,1]],[[0,1,1],[1,1,0]]];
+    function stopAllGame(){
+        if(tetrisTimer) clearInterval(tetrisTimer);tetrisTimer=null;
+        if(brickTimer) clearInterval(brickTimer);brickTimer=null;
+        tetrisCanvas.style.display="none";
+        brickCanvas.style.display="none";
+        document.getElementById("tetrisPreview").style.display="flex";
+        document.getElementById("brickPreview").style.display="flex";
+    }
+    // =========俄罗斯方块逻辑=========
+    function newPiece(){
+        let s=shapes[Math.floor(Math.random()*shapes.length)];
+        piece=s;
+        px=Math.floor((COL-piece[0].length)/2);
+        py=0;
+    }
+    function resetBoard(){
+        board=Array.from({length:ROW},()=>Array(COL).fill(0));
+        newPiece();
+    }
+    function drawTetris(){
+        tctx.fillStyle="#000";
+        tctx.fillRect(0,0,tetrisCanvas.width,tetrisCanvas.height);
+        for(let y=0;y<ROW;y++){
+            for(let x=0;x<COL;x++){
+                if(board[y][x]){
+                    tctx.fillStyle="#00ccff";
+                    tctx.fillRect(x*SZ,y*SZ,SZ-1,SZ-1);
+                }
+            }
+        }
+        for(let y=0;y<piece.length;y++){
+            for(let x=0;x<piece[y].length;x++){
+                if(piece[y][x]){
+                    tctx.fillStyle="#ffcc00";
+                    tctx.fillRect((px+x)*SZ,(py+y)*SZ,SZ-1,SZ-1);
+                }
+            }
+        }
+    }
+    function collideTetris(dx=0,dy=0,testPiece=piece){
+        for(let y=0;y<testPiece.length;y++){
+            for(let x=0;x<testPiece[y].length;x++){
+                if(testPiece[y][x]){
+                    let nx=px+x+dx;
+                    let ny=py+y+dy;
+                    if(nx<0||nx>=COL) return true;
+                    if(ny>=ROW) return true;
+                    if(ny>=0 && board[ny][nx]) return true;
+                }
+            }
+        }
+        return false;
+    }
+    function rotatePiece(){
+        let rotated=piece[0].map((_,i)=>piece.map(row=>row[i]).reverse());
+        if(!collideTetris(0,0,rotated)){
+            piece=rotated;
+        }
+    }
+    function mergePiece(){
+        for(let y=0;y<piece.length;y++){
+            for(let x=0;x<piece[y].length;x++){
+                if(piece[y][x] && py+y>=0){
+                    board[py+y][px+x]=1;
+                }
+            }
+        }
+        for(let y=ROW-1;y>=0;y--){
+            if(board[y].every(v=>v)){
+                board.splice(y,1);
+                board.unshift(Array(COL).fill(0));
+            }
+        }
+        newPiece();
+        if(collideTetris()) resetBoard();
+    }
+    function tetrisStep(){
+        if(!collideTetris(0,1)) py++;
+        else mergePiece();
+        drawTetris();
+    }
+    function startTetrisGame(){
+        stopAllGame();
+        document.getElementById("tetrisPreview").style.display="none";
+        tetrisCanvas.style.display="block";
+        resetBoard();
+        drawTetris();
+        tetrisTimer=setInterval(tetrisStep,600);
+    }
+    // =========打砖块逻辑=========
+    function initBrick(){
+        ballX=240;ballY=200;ballDX=3;ballDY=-3;padX=180;
+        bricks=[];
+        for(let r=0;r<5;r++){
+            for(let c=0;c<8;c++){
+                bricks.push({x:c*60+10,y:r*20+10,w:50,h:15});
+            }
+        }
+    }
+    function drawBrick(){
+        bctx.fillStyle="#000";
+        bctx.fillRect(0,0,brickCanvas.width,brickCanvas.height);
+        bctx.fillStyle="#00cc00";
+        for(let br of bricks){
+            bctx.fillRect(br.x,br.y,br.w,br.h);
+        }
+        bctx.fillStyle="#ffffff";
+        bctx.fillRect(padX,300,120,12);
+        bctx.beginPath();
+        bctx.arc(ballX,ballY,8,0,Math.PI*2);
+        bctx.fill();
+    }
+    function brickTick(){
+        ballX+=ballDX;
+        ballY+=ballDY;
+        if(ballX<8||ballX>brickCanvas.width-8) ballDX=-ballDX;
+        if(ballY<8) ballDY=-ballDY;
+        if(ballY>310){ initBrick(); }
+        if(ballY>292 && ballX>padX && ballX < padX+120){
+            ballDY=-Math.abs(ballDY);
+        }
+        for(let i=bricks.length-1;i>=0;i--){
+            let br=bricks[i];
+            if(ballX>br.x && ballX<br.x+br.w && ballY>br.y && ballY<br.y+br.h){
+                bricks.splice(i,1);
+                ballDY=-ballDY;
+                break;
+            }
+        }
+        drawBrick();
+    }
+    function startBrickGame(){
+        stopAllGame();
+        document.getElementById("brickPreview").style.display="none";
+        brickCanvas.style.display="block";
+        initBrick();
+        drawBrick();
+        brickTimer=setInterval(brickTick,25);
+    }
+    //键盘监听
+    document.addEventListener("keydown",e=>{
+        if(!document.getElementById("game").classList.contains("active")) return;
+        if(e.key==="Escape"){
+            stopAllGame();
+            return;
+        }
+        //游戏运行时阻止方向键空格页面滚动
+        if(tetrisTimer || brickTimer){
+            if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"," "].includes(e.key)){
+                e.preventDefault();
+            }
+        }
+        //俄罗斯方块按键
+        if(tetrisTimer){
+            if(e.key=="ArrowLeft" && !collideTetris(-1,0)) px--;
+            if(e.key=="ArrowRight" && !collideTetris(1,0)) px++;
+            if(e.key=="ArrowDown") tetrisStep();
+            if(e.key=="ArrowUp" || e.key.toLowerCase()==="x") rotatePiece();
+            if(e.key==" "){
+                while(!collideTetris(0,1)) py++;
+                mergePiece();
+            }
+            drawTetris();
+        }
+        //打砖块按键
+        if(brickTimer){
+            if(e.key=="ArrowLeft") padX=Math.max(0,padX-15);
+            if(e.key=="ArrowRight") padX=Math.min(360,padX+15);
+        }
+    })
+
+    //================ HTML编辑器JS逻辑 =================
+    const htmlCodeArea = document.getElementById('htmlCode');
+    const highlightView = document.getElementById('highlightView');
+    const btnNew = document.getElementById('btnNew');
+    const btnImport = document.getElementById('btnImport');
+    const btnExport = document.getElementById('btnExport');
+    const fileInput = document.getElementById('fileInput');
+
+    //简单HTML语法高亮
+    function syntaxHighlight(html){
+        html = html.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        html = html.replace(/(&lt;\/?)(\w+)/g,'<span class="hl-tag">$1$2</span>');
+        html = html.replace(/(\w+)(?==)/g,'<span class="hl-attr">$1</span>');
+        html = html.replace(/(".*?"|'.*?')/g,'<span class="hl-string">$1</span>');
+        html = html.replace(/(&lt;!--[\s\S]*?--&gt;)/g,'<span class="hl-comment">$1</span>');
+        return html;
+    }
+    function updateHighlight(){
+        highlightView.innerHTML = syntaxHighlight(htmlCodeArea.value);
+    }
+    //同步滚动
+    htmlCodeArea.addEventListener('scroll',()=>{
+        highlightView.scrollTop = htmlCodeArea.scrollTop;
+        highlightView.scrollLeft = htmlCodeArea.scrollLeft;
+    })
+    htmlCodeArea.addEventListener('input',updateHighlight);
+
+    //新建
+    btnNew.onclick = function(){
+        htmlCodeArea.value = "";
+        updateHighlight();
+    }
+    //导入本地html
+    btnImport.onclick = function(){
+        fileInput.click();
+    }
+    fileInput.onchange = function(e){
+        const f = e.target.files[0];
+        if(!f) return;
+        const reader = new FileReader();
+        reader.onload = function(ev){
+            htmlCodeArea.value = ev.target.result;
+            updateHighlight();
+        }
+        reader.readAsText(f,"utf-8");
+        fileInput.value = "";
+    }
+    //导出下载html
+    btnExport.onclick = function(){
+        const content = htmlCodeArea.value;
+        const blob = new Blob([content],{type:"text/html;charset=utf‑8"});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "index.html";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(a.href);
+    }
+</script>
+</body>
+</html>
